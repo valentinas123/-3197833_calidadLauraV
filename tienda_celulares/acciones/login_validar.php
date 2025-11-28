@@ -7,8 +7,8 @@ if(isset($_POST['usuario']) && isset($_POST['clave'])) {
     $usuario = $conexion->real_escape_string($_POST['usuario']);
     $clave = $_POST['clave'];
 
-    $sql = "SELECT * FROM usuarios 
-            WHERE usuario = '$usuario' 
+    $sql = "SELECT * FROM usuarios
+            WHERE usuario = '$usuario'
             AND clave = SHA2('$clave', 256)";
 
     $resultado = $conexion->query($sql);
