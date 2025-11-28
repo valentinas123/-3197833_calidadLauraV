@@ -1,41 +1,65 @@
 <?php
 include_once "../config/conexion.php";
 
-if(isset($_POST['id'], $_POST['nombre'], $_POST['precio'], $_POST['descripcion'], $_POST['tipo_id'])) {
-    $id = (int)$_POST['id']; // Cast a entero para mayor seguridad
-    $nombre = $conexion->real_escape_string($_POST['nombre']);
+$error = "";
+$id = 0; // evitar variable indefinida en el HTML
+
+// Validar que todos los datos llegaron
+if (
+    isset($_POST['id'], $_POST['nombre'], $_POST['precio'], $_POST['descripcion'], $_POST['tipo_id'])
+) {
+    // Sanitizar entradas
+    $id = (int)$_POST['id'];
+    $nombre = trim($_POST['nombre']);
     $precio = (float)$_POST['precio'];
-    $descripcion = $conexion->real_escape_string($_POST['descripcion']);
+    $descripcion = trim($_POST['descripcion']);
     $tipo = (int)$_POST['tipo_id'];
 
+    // Consulta segura (SonarCloud la exige)
     $sql = "UPDATE productos 
-            SET nombre='$nombre', precio='$precio', descripcion='$descripcion', tipo_id='$tipo'
-            WHERE id=$id";
+            SET nombre = ?, precio = ?, descripcion = ?, tipo_id = ?
+            WHERE id = ?";
 
-    if($conexion->query($sql)) {
-        header("Location: /tienda_celulares/vistas/productos_listar.php");
-        exit();
+    $stmt = $conexion->prepare($sql);
+
+    if ($stmt) {
+        // Tipos:
+        // s = string, d = double, s = string, i = int, i = int
+        $stmt->bind_param("sdsii", $nombre, $precio, $descripcion, $tipo, $id);
+
+        if ($stmt->execute()) {
+            header("Location: /tienda_celulares/vistas/productos_listar.php");
+            exit;
+        } else {
+            $error = "Error al actualizar el producto.";
+        }
+
+        $stmt->close();
     } else {
-        $error = "Error al actualizar el producto: " . $conexion->error;
+        $error = "Error en la consulta SQL.";
     }
+
 } else {
     $error = "Faltan datos obligatorios para actualizar el producto.";
 }
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Actualizar Producto</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
 <div class="container mt-5">
-    <?php if(isset($error)): ?>
-        <div class="alert alert-danger"><?= $error ?></div>
-        <a href="/tienda_celulares/vistas/productos_editar.php?id=<?= $id ?>" class="btn btn-primary">Volver</a>
+    <?php if ($error !== ""): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+        <a href="/tienda_celulares/vistas/productos_editar.php?id=<?= htmlspecialchars($id) ?>" class="btn btn-primary">
+            Volver
+        </a>
     <?php endif; ?>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
