@@ -2,20 +2,16 @@
 include_once "../config/conexion.php";
 
 $error = "";
-$id = 0; // evitar variable indefinida en el HTML
+$id = 0;
 
-// Validar que todos los datos llegaron
 if (
     isset($_POST['id'], $_POST['nombre'], $_POST['precio'], $_POST['descripcion'], $_POST['tipo_id'])
 ) {
-    // Sanitizar entradas
     $id = (int)$_POST['id'];
     $nombre = trim($_POST['nombre']);
     $precio = (float)$_POST['precio'];
     $descripcion = trim($_POST['descripcion']);
     $tipo = (int)$_POST['tipo_id'];
-
-    // Consulta segura (SonarCloud la exige)
     $sql = "UPDATE productos 
             SET nombre = ?, precio = ?, descripcion = ?, tipo_id = ?
             WHERE id = ?";
@@ -23,8 +19,6 @@ if (
     $stmt = $conexion->prepare($sql);
 
     if ($stmt) {
-        // Tipos:
-        // s = string, d = double, s = string, i = int, i = int
         $stmt->bind_param("sdsii", $nombre, $precio, $descripcion, $tipo, $id);
 
         if ($stmt->execute()) {
