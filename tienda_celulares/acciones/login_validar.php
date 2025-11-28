@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "../config/conexion.php";
+include_once "../config/conexion.php";
 
 if(isset($_POST['usuario']) && isset($_POST['clave'])) {
 
