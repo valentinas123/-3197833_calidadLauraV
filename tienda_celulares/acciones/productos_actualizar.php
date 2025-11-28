@@ -1,5 +1,5 @@
 <?php
-include "../config/conexion.php";
+include_once "../config/conexion.php";
 
 if(isset($_POST['id'], $_POST['nombre'], $_POST['precio'], $_POST['descripcion'], $_POST['tipo_id'])) {
     $id = (int)$_POST['id']; // Cast a entero para mayor seguridad
