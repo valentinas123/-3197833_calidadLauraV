@@ -1,7 +1,7 @@
 <?php
 $host = "localhost";
 $usuario = "root";
-$clave = "";
+$clave = "123";
 $basedatos = "tienda";
 
 $conexion = new mysqli($host, $usuario, $clave, $basedatos);
